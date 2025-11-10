@@ -7,14 +7,6 @@ defaults: &defaults
     - image: cimg/python:3.10
   working_directory: ~/project
 
-prepare_venv: &prepare_venv
-  run:
-    name: Create venv
-    command: |
-      python -m venv venv
-      source venv/bin/activate
-      pip install --upgrade pip
-
 jobs:
   deploy_app_to_railway:
     <<: *defaults
@@ -23,22 +15,19 @@ jobs:
           path: ~/project/
       - node/install:
           node-version: '20.9'
-      - run: node --version 
+      - run: node --version
       - run: npm i -g @railway/cli
+      # Importante: moverse primero al directorio que se va a desplegar
       - run:
-          name: Deploy to Railway App
+          name: Link dentro de bankchurn-api
           command: |
             cd bankchurn-api
-            railway up --service=jubilant-flow
-            railway up --detach
-
-
-tags_only: &tags_only
-  filters:
-    branches:
-      ignore: /.*/
-    tags:
-      only: /^.*/
+            railway link -p 5b75906f-ae62-4a49-9828-d6d83571f943 --service "jubilant-flow"
+      - run:
+          name: Deploy a Railway (no interactivo)
+          command: |
+            cd bankchurn-api
+            RAILWAY_CI=1 railway up -p 5b75906f-ae62-4a49-9828-d6d83571f943 --service "jubilant-flow" --detach
 
 workflows:
   version: 1
