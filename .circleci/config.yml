@@ -17,17 +17,19 @@ jobs:
           node-version: '20.9'
       - run: node --version
       - run: npm i -g @railway/cli
-      # Importante: moverse primero al directorio que se va a desplegar
+
+      # 🔗 Enlazar proyecto y servicio en CI (imprescindible)
       - run:
-          name: Link dentro de bankchurn-api
+          name: Link Railway project & service
           command: |
-            cd bankchurn-api
             railway link -p 5b75906f-ae62-4a49-9828-d6d83571f943 --service "jubilant-flow"
+
+      # 🚀 Deploy
       - run:
-          name: Deploy a Railway (no interactivo)
+          name: Deploy to Railway App
           command: |
             cd bankchurn-api
-            RAILWAY_CI=1 railway up -p 5b75906f-ae62-4a49-9828-d6d83571f943 --service "jubilant-flow" --detach
+            railway up --service "jubilant-flow" --detach
 
 workflows:
   version: 1
